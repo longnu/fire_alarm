@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Floor Map Example - Leaflet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+      <!-- Load Leaflet from CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+crossorigin=""></script>
+
+      <!-- Personal style and script file links -->
+ <!--     <link rel="stylesheet" href="css/style.css">
+      <script src="js/script.js" type="text/javascript" defer></script>-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>          
+<script type="text/javascript" src="leaflet.ajax.min.js"></script>   
+</head>
+
+<body>
+	<section class="intro_top">
+		
+<div class="slogan sprite">로고나 슬로건</div>
+		<p class="s_title">소제목</p>
+		<ul>
+			<li><a><span>건물1</span></a>
+					<ul>
+						<li>1F</li>
+						<li>2F</li>
+						<li>3F</li>
+					</ul>
+			</li>
+			<li><a> <span>건물2</span></a>
+					<ul>
+						<li>1F</li>
+						<li>2F</li>
+						<li>3F</li>
+					</ul>
+			</li>
+		</ul>
+		
+<div id="map" style="width: 800px; height: 600px;"></div>
+	<span>
+				<button id = "btna1">기계1</button>
+				<button id = "btna2">기계2</button>
+				<button id = "btna3">기계3</button>
+				<button id = "btna4">기계4</button>
+			</span>
+			<span></span>
+			<span></span>
+		</div>
+		<div>
+				<button id = "btnb1">대피로1</button>
+				<button id = "btnb2">대피로2</button>
+				<button id = "btnb3">대피로3</button>
+				<button id = "btnb4">대피로4</button>
+				
+<script>
+document.getElementById("btna1").addEventListener("click", btnclk1);
+function btnclk1(){
+     var b = L.imageOverlay("1F.jpg", bounds).addTo(map);
+}
+document.getElementById("btna2").addEventListener("click", btnclk2);
+function btnclk2(){
+     var b = L.imageOverlay("2F.jpg", bounds).addTo(map);
+}
+document.getElementById("btna3").addEventListener("click", btnclk3);
+function btnclk3(){
+     var b = L.imageOverlay("3F.jpg", bounds).addTo(map);
+}
+
+//----------------------------------지도 기본 세팅 --------------------------------------------     
+    var map = L.map('map', {crs: L.CRS.Simple});
+    var bounds = [[0,0], [600,800]]; // Set the image resolution as the boundary
+    L.imageOverlay("final.png", bounds).addTo(map); // Set the background image
+  	map.fitBounds(bounds); // Set an area
+//---------------------------------------------------------------------------------------    
+
+//----------------------------------아이콘 변경 기능------------------------------------------
+  //나중에 사용(트루 펄스로 조건문 제어)  
+    var a = true;
+  //파폭 아이콘 선언 
+    var firefoxIcon = L.icon({
+        iconUrl: 'http://joshuafrazier.info/images/firefox.svg',
+        iconSize: [38, 95], // size of the icon
+        popupAnchor: [0,-15]
+        });
+
+     //크롬 아이콘 선언   
+    var chromeIcon = L.icon({
+        iconUrl: 'https://www.logo.wine/a/logo/Google_Chrome/Google_Chrome-Logo.wine.svg',
+        iconSize: [42, 99], // size of the icon
+        popupAnchor: [0,-15]
+        }); 
+     
+    L.circle([400, 300], {color: 'green',radius: 20}).addTo(map)//(30,50)좌표에 원 생성
+    .on("click", circleClick);// .on("click", 사용자정의함수) 형식, 클릭시 사용자정의함수를 실행시키라는 함수 
+     
+
+    function circleClick(e) {// e는 그 클릭된 대상
+        var clickedCircle = e.target; //클릭된 대상을 변수에 저장
+        clickedCircle.remove(); // 원 삭제 기능
+        L.marker([400, 300], {icon: firefoxIcon}).addTo(map).on("click", markerClick);
+        // 원을 삭제하고 아이콘을 그 위치에 생성 (근데 리플렛은 아이콘생성하려면 리플렛 고유의 "마커"라는 
+        // 개체를 생성하고 거기에 붙여야 함 그래서 마커만들고 거기에 아이콘 붙이고 그것을 맵에다 붙이고 그것에 
+        // 클릭시 실행할 사용자정의함수를 붙였음 )
+    }
+    
+    function markerClick(e) {
+        
+        var clickedmarker = e.target;    
+        if(a) //현재 제일 위에서 전역변수로 a를 트루라고 해놓았음 따라서 처음 마커클릭하면 여기가 실행됨
+        {clickedmarker.setIcon(chromeIcon); //처음 마커클릭하면 크롬아이콘으로 바꿈
+            a = false; //그리고 상태(=a)를 펄스라고 바꿈 (다음 클릭시에는 다른 기능을 작동시키게끔)
+        }
+        
+        else{ // 두번째 클릭때는 상태(=a)가 펄스인 상태이기때문에 여기가 실행됨, 다시 원으로 돌아가게 함
+            clickedmarker.remove();
+            L.circle([400, 300], {color: 'green',radius: 20}).addTo(map)//(30,50)좌표에 원 생성
+        .on("click", circleClick);
+        a=true;
+        
+        }
+    }
+    
+      //---------------------------------------------------------------------------------------  
+
+// -----------------------------------리플렛 용 Ajax통신하는 기능----------------------------------    
+    function popUp(feature, layer) {
+        layer.bindTooltip(feature.properties.gas, {permanent: true, direction: 'center'}).openTooltip();
+        }   
+      
+   function changeColor(feature,layer) {
+       if (feature.properties.gas < 30)
+    	
+    	
+    	
+    a1 = L.geoJSON(feature, {
+            style: myStyle1
+            }).addTo(map);   
+    }          
+   } 
+    
+    setInterval(function(){
+    	new L.GeoJSON.AJAX("MonitorServiceCon", {onEachFeature:popUp}).addTo(map)}, 2000);
+       new L.GeoJSON.AJAX("MonitorServiceCon", {onEachFeature:changeColor}).addTo(map)}, 2000);
+//---------------------------------------------------------------------------------------------
+
+    
+// -----------------------------------화면에 구역 표시하는 기능-----------------------------------	
+	//GeoJson이라는 건데 제이슨인데 리플렛용 제이슨 같음 이렇게 제이슨을 선언하면 바로 맵에 그 정보가 나타남
+    var roomcounter = {
+    "type": "Feature",
+    "properties": {
+        "name": "counter",
+        "flame": "",   //이 구역은 이러한 정보를 담고있다는 의미
+        "gas": "",
+        "temp": "",
+    },
+    "geometry": { // 좌표정보 적는 곳
+        "type": "Polygon", //만약 여기를 직선으로 선언하면 아래 좌표를  [40, 180],   [40, 340] 두개만 선언하면 됨
+                            //지금은 다각형으로 선언해서 좌표 4개를 찍어서 사각형으로 만들었음
+        "coordinates": [[
+        [40, 180],
+        [40, 340],    
+        [180, 340],
+        [180, 180],         
+        ]]
+    }
+};
+ 
+    //GepJson 스타일 바꿀려고 스타일 유형을 미리 지정해놓음(빨주노초파남보)
+     
+      var myStyle1 = {
+           "color": "#FFEDA0",
+           "weight": 5,
+           "opacity": 0.65
+       };
+           
+           
+              var myStyle2 = {
+                  "color": "#FED976",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+           
+           var myStyle3 = {
+                  "color": "#FEB24C",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+           
+           var myStyle4 = {
+                  "color": "#FD8D3C",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+           
+           var myStyle5 = {
+                  "color": "#FC4E2A",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+           
+           var myStyle6 = {
+                  "color": " #E31A1C",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+           
+           var myStyle7 = {
+                  "color": "#BD0026",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+
+              var myStyle8 = {
+                  "color": "#800026",
+                  "weight": 5,
+                  "opacity": 0.65
+              };
+    
+      	
+    
+           
+      a1 = L.geoJSON(roomcounter, {
+               style: myStyle1
+               }).addTo(map);          
+ //--------------------------------------------------------------------------------------      
+   
+
+ 
+    </script>
+    </body>
+    </html>
